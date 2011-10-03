@@ -41,7 +41,7 @@
 <style type="text/css">
 <!--
 
-body {font-family: Arial, Helvetica, sans-serif;font-size:12px;}
+body {font-family: Arial, Helvetica, sans-serif;font-size:12px;background:#999}
 #downloadSuccessList {float:right;}
 
 -->
@@ -49,7 +49,7 @@ body {font-family: Arial, Helvetica, sans-serif;font-size:12px;}
 </head>
 
 <body>
-	<div id="wrapper" style="margin:0 auto;width:600px">
+	<div id="wrapper" style="margin:50px auto;width:600px;padding:40px;border-radius:10px;background:#fff">
 	
 	<!-- <pre><?php // print_r($_POST); ?></pre> -->
 		
@@ -127,11 +127,15 @@ body {font-family: Arial, Helvetica, sans-serif;font-size:12px;}
 	
 	?>
 	<form method="post" action="">
-		<p>Profile name (optional): </p>
-		<input type="text" name="profileName" /><br/>
-		<p>Enter plugin names to download:</p>
+		<p>
+		Save as: <em>(optional)</em> <br/>
+			<input type="text" name="profileName" style="width:300px;padding:5px" placeholder="Profile name"/>
+		</p><br/>
 		
-		<textarea name="pluginNames" rows="15" cols="40"><?php print $defaultLines; ?></textarea><br/>
+		<p>Plugins to download from the <a href="http://wordpress.org/extend/plugins/" target="_blank">Wordpress Plugin Directory</a>:<br/>
+			<textarea name="pluginNames" rows="15" cols="40"><?php print $defaultLines; ?></textarea>
+		</p>
+		
 		<input type="submit" name="submit" value="Download plugins"/>
 	</form>
 	</div> <!-- end wrapper -->

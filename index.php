@@ -4,8 +4,8 @@
 	$lines = $_POST['pluginNames'];
 	$linesArray = explode("\n", $lines);
 	
-	if ( isset($_POST['profileName']) ) { 
-		$profileName = $_POST['profileName'] . '.profile.php';
+	if ( isset($_POST['profileName']) && isset($_POST['saveProfile']) ) { 
+		$profileName = $_POST['profileName'] . '.profile';
 		$profileName = str_replace(' ', '-', $profileName);
 		
 		$newProfile = fopen($profileName,"w"); 
@@ -15,12 +15,17 @@
 	}
 		
 		// read data from default profile
-		$readDefaults = fopen('default.profile.php',"r");
-		$defaultLines = fread($readDefaults, filesize('default.profile.php'));
+		$readDefaults = fopen('default.profile',"r");
+		$defaultLines = fread($readDefaults, filesize('default.profile'));
 		fclose($readDefaults);
 ?>
-
 <!DOCTYPE html>
+
+<!-- 
+Version 0.3
+
+
+-->
 
 <html lang="en">
     <head>
@@ -43,6 +48,9 @@
 
 body {font-family: Arial, Helvetica, sans-serif;font-size:12px;background:#999}
 #downloadSuccessList {float:right;}
+a, a:visited {color:#000}
+#pluginNames, #profileName {border:1px solid #999;padding:5px}
+.success {background:#F7D065;padding:5px}
 
 -->
 </style>
@@ -51,10 +59,16 @@ body {font-family: Arial, Helvetica, sans-serif;font-size:12px;background:#999}
 <body>
 	<div id="wrapper" style="margin:50px auto;width:600px;padding:40px;border-radius:10px;background:#fff">
 	
+	<?php if ( $written > 0 ) { ?>
+		<p class="success">Saved as <?php print $profileName; ?>. 
+		<a href="<?php print $profileName; ?>">Download</a>
+		</p>
+	<?php } ?>
+	
 	<!-- <pre><?php // print_r($_POST); ?></pre> -->
 		
 		<?php 
-		if (isset($lines)) { ?>
+		if ( isset($lines) && $_POST['downloadPlugins'] ) { ?>
 			<div id="downloadSuccessList">
 			<p>Downloaded plugins:</p>
 			<ul>
@@ -98,7 +112,7 @@ body {font-family: Arial, Helvetica, sans-serif;font-size:12px;background:#999}
 						$delete = unlink($filename);
 						print '<li>'. $line .'</li>';
 					} else {
-						print 'Not downloaded';
+						print $line . 'not downloaded';
 					} 
 				
 				
@@ -107,19 +121,21 @@ body {font-family: Arial, Helvetica, sans-serif;font-size:12px;background:#999}
 			</div>
 		<?php } // end if isset ?>
 	
-	
-	<!-- <form>
+	<!--
+	 <form style="margin-bottom:30px">
 		<select id="profileFilename" name="profileFilename">
 			<?php $profilesList = scandir(getcwd());
-			
 			foreach ( $profilesList as $profileFile ) {
-				if ( preg_match( '(\.php$)', $profileFile) ) {
-					echo '<option value="' . $profileFile . '">' . $profileFile . '</option>';
+				if ( preg_match( '(profile$)', $profileFile) ) {
+					$nameLength = stripos($profileFile, '.');
+					$name = substr($profileFile,0,$nameLength);
+					echo '<option value="' . $profileFile . '">' . $name . '</option>';
 				}
 			}			
 		?>
 		</select>
-	</form> -->
+	</form> 
+	-->
 	
 	<?php
 		$profilesList = scandir(getcwd());
@@ -128,15 +144,15 @@ body {font-family: Arial, Helvetica, sans-serif;font-size:12px;background:#999}
 	?>
 	<form method="post" action="">
 		<p>
-		Save as: <em>(optional)</em> <br/>
-			<input type="text" name="profileName" style="width:300px;padding:5px" placeholder="Profile name"/>
+		<strong>Save as:</strong> <em>(optional)</em> <br/>
+			<input type="text" name="profileName" id="profileName" style="width:300px;" placeholder="Profile name"/>
 		</p><br/>
 		
-		<p>Plugins to download from the <a href="http://wordpress.org/extend/plugins/" target="_blank">Wordpress Plugin Directory</a>:<br/>
-			<textarea name="pluginNames" rows="15" cols="40"><?php print $defaultLines; ?></textarea>
+		<p><strong>Plugins</strong> <em>(names found in the <a href="http://wordpress.org/extend/plugins/" target="_blank">Wordpress Plugin Directory</a>)</em>:<br/>
+			<textarea name="pluginNames" id="pluginNames" rows="15" cols="40"><?php print $defaultLines; ?></textarea>
 		</p>
-		
-		<input type="submit" name="submit" value="Download plugins"/>
+		<input type="submit" name="saveProfile" value="Save new profile" style="padding:5px"/>&nbsp;&nbsp;
+		<input type="submit" name="downloadPlugins" value="Download plugins" style="padding:5px"/>
 	</form>
 	</div> <!-- end wrapper -->
 </body>

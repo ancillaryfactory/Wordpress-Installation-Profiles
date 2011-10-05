@@ -4,6 +4,14 @@
 	$lines = $_POST['pluginNames'];
 	$linesArray = explode("\n", $lines);
 	
+	if ( isset($_POST['importSubmit'] ) ) {
+		$newFile = $_FILES['importedFile']['tmp_name'];
+		$uploadDir = getcwd() . '/' . $_FILES['importedFile']['name'];
+		$moved = move_uploaded_file($newFile,$uploadDir);
+	}
+	
+	
+	
 	if ( isset($_POST['profileName']) && isset($_POST['saveProfile']) ) { 
 		$profileName = $_POST['profileName'] . '.profile';
 		$profileName = str_replace(' ', '-', $profileName);
@@ -32,16 +40,26 @@ Version 0.3
         <meta charset="utf-8" />
  <title>WP Installation Profile</title>
  
- <!-- <link rel="stylesheet" href="http://twitter.github.com/bootstrap/1.3.0/bootstrap.min.css"> 
+ <!-- <link rel="stylesheet" href="http://twitter.github.com/bootstrap/1.3.0/bootstrap.min.css"> -->
  
-<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.3/jquery.min.js"></script>
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.4/jquery.min.js"></script>
 
 <script type="text/javascript">
   $(document).ready(function() {
-  
+	$('#profileFilename').change(function() {
+		var filename = $(this).val();
+		$.ajax({
+			type: "GET",
+			url: filename,
+			dataType: "text",
+			success: function(text) {
+				$('#pluginNames').val(text);
+			}
+		})
+	});
   });
 </script>
--->
+
 
 <style type="text/css">
 <!--
@@ -51,7 +69,6 @@ body {font-family: Arial, Helvetica, sans-serif;font-size:12px;background:#999}
 a, a:visited {color:#000}
 #pluginNames, #profileName {border:1px solid #999;padding:5px}
 .success {background:#F7D065;padding:5px}
-
 -->
 </style>
 </head>
@@ -65,7 +82,9 @@ a, a:visited {color:#000}
 		</p>
 	<?php } ?>
 	
-	<!-- <pre><?php // print_r($_POST); ?></pre> -->
+<!--<pre><?php // print_r($_FILES['importedFile']); 
+// print $uploadDir;
+?></pre>-->
 		
 		<?php 
 		if ( isset($lines) && $_POST['downloadPlugins'] ) { ?>
@@ -112,8 +131,8 @@ a, a:visited {color:#000}
 						$delete = unlink($filename);
 						print '<li>'. $line .'</li>';
 					} else {
-						print $line . 'not downloaded';
-					} 
+						print '<li>' . $line . ' not downloaded</li>';
+					}  
 				
 				
 			} // end foreach  ?>
@@ -121,8 +140,19 @@ a, a:visited {color:#000}
 			</div>
 		<?php } // end if isset ?>
 	
-	<!--
-	 <form style="margin-bottom:30px">
+	<div id="importForm" style="margin-bottom:40px">
+		<form method="post" action="" enctype="multipart/form-data">
+			<p><strong>Import profile:</strong><br/>
+			<input type="file" name="importedFile" />
+			<input type="submit" name="importSubmit" value="Upload" /></p>
+		</form>
+	</div>
+	
+	
+	<form method="post" action="">
+		<p>
+		
+		<strong>Choose:</strong>
 		<select id="profileFilename" name="profileFilename">
 			<?php $profilesList = scandir(getcwd());
 			foreach ( $profilesList as $profileFile ) {
@@ -134,26 +164,19 @@ a, a:visited {color:#000}
 			}			
 		?>
 		</select>
-	</form> 
-	-->
-	
-	<?php
-		$profilesList = scandir(getcwd());
+		<strong>&nbsp;&nbsp;or 
 		
-	
-	?>
-	<form method="post" action="">
-		<p>
-		<strong>Save as:</strong> <em>(optional)</em> <br/>
-			<input type="text" name="profileName" id="profileName" style="width:300px;" placeholder="Profile name"/>
+		save as new:</strong>
+			<input type="text" name="profileName" id="profileName" style="width:150px;" placeholder="Profile name"/>
 		</p><br/>
 		
 		<p><strong>Plugins</strong> <em>(names found in the <a href="http://wordpress.org/extend/plugins/" target="_blank">Wordpress Plugin Directory</a>)</em>:<br/>
-			<textarea name="pluginNames" id="pluginNames" rows="15" cols="40"><?php print $defaultLines; ?></textarea>
+			<textarea name="pluginNames" id="pluginNames" rows="15" cols="46"><?php print $defaultLines; ?></textarea>
 		</p>
-		<input type="submit" name="saveProfile" value="Save new profile" style="padding:5px"/>&nbsp;&nbsp;
+		<input type="submit" name="saveProfile" value="Save profile" style="padding:5px"/>&nbsp;&nbsp;
 		<input type="submit" name="downloadPlugins" value="Download plugins" style="padding:5px"/>
 	</form>
+	
 	</div> <!-- end wrapper -->
 </body>
 </html>

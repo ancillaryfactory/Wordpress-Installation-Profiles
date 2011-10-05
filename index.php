@@ -65,9 +65,8 @@ Version 0.3
 
 <style type="text/css">
 <!--
-
 body {font-family: Arial, Helvetica, sans-serif;font-size:12px;background:#999}
-#downloadSuccessList {float:right;}
+#downloadSuccessList {background: none repeat scroll 0 0 #A6F29F;border-radius: 10px;padding: 10px;}
 a, a:visited {color:#000}
 #pluginNames, #profileName {border:1px solid #999;padding:5px}
 .success {background:#F7D065;padding:5px}
@@ -100,7 +99,7 @@ h2 {border-bottom: 2px solid;color: #c2c2c2;margin-bottom: 30px;margin-top: 0;pa
 		<?php 
 		if ( isset($lines) && $_POST['downloadPlugins'] ) { ?>
 			<div id="downloadSuccessList">
-			<p>Downloaded plugins:</p>
+			<p><strong>Downloaded plugins:</strong></p>
 			<ul>
 			<?php 
 			foreach ($linesArray as $line) {
@@ -113,6 +112,10 @@ h2 {border-bottom: 2px solid;color: #c2c2c2;margin-bottom: 30px;margin-top: 0;pa
 				
 				// gets filename from Wordpress API
 					$pluginURL = $plugin->download_link;
+					$apiName = $plugin->name;
+					$apiVersion = $plugin->version;
+					$apiHomepage = $plugin->homepage;
+					
 					$path_parts = pathinfo($pluginURL);
 					$filename = $path_parts['filename'] . '.' . $path_parts['extension'];
 					$path = $filename;
@@ -140,7 +143,7 @@ h2 {border-bottom: 2px solid;color: #c2c2c2;margin-bottom: 30px;margin-top: 0;pa
 					
 					if ( $downloadTest > 0 ) {
 						$delete = unlink($filename);
-						print '<li>'. $line .'</li>';
+						print '<li><a href="' . $apiHomepage . '" target="_blank">'. $apiName . '</a> ' . $apiVersion . '</li>';
 					} else {
 						print '<li>' . $line . ' not downloaded</li>';
 					}  

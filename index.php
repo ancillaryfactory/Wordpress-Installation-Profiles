@@ -54,6 +54,11 @@ Version 0.3
 				$('#pluginNames').val(text);
 			});
 		});
+		
+		$('#importFormWrapper').hide();
+		$('#toggleImport').click(function() {
+			$('#importFormWrapper').slideToggle();
+		});
 	});
 </script>
 
@@ -67,7 +72,7 @@ a, a:visited {color:#000}
 #pluginNames, #profileName {border:1px solid #999;padding:5px}
 .success {background:#F7D065;padding:5px}
 h2 {border-bottom: 2px solid;color: #c2c2c2;margin-bottom: 30px;margin-top: 0;padding-bottom: 10px;}
-#importForm {border-bottom: 1px dashed #333;padding-bottom:20px;}
+#importForm {border-bottom: 1px dashed #333;padding: 0 5px;text-align:right;background:#d5d5d5;}
 #profileFilename {padding:5px;}
 -->
 </style>
@@ -146,9 +151,12 @@ h2 {border-bottom: 2px solid;color: #c2c2c2;margin-bottom: 30px;margin-top: 0;pa
 			</div>
 		<?php } // end if isset ?>
 	
+	<p style="margin-bottom:20px;text-align:right"><a href="#" id="toggleImport"><strong>Import profile</strong></a></p>
+	
 	<div id="importFormWrapper" style="margin-bottom:40px">
 		<form method="post" action="" enctype="multipart/form-data" id="importForm">
-			<p><strong>Import profile:</strong><br/>
+			<p>
+			<!-- <strong>Import profile:</strong>--><br/>
 			<input type="file" name="importedFile" />
 			<input type="submit" name="importSubmit" value="Upload" /></p>
 		</form>
@@ -174,8 +182,8 @@ h2 {border-bottom: 2px solid;color: #c2c2c2;margin-bottom: 30px;margin-top: 0;pa
 		</select>
 		<strong>&nbsp;&nbsp;or 
 		
-		save as new:</strong>
-			<input type="text" name="profileName" id="profileName" style="width:150px;" placeholder="Profile name"/>
+		save this profile as:&nbsp;&nbsp;</strong>
+			<input type="text" name="profileName" id="profileName" style="width:150px;" placeholder="Name"/>
 		</p><br/>
 		
 		<p><strong>Plugins</strong> <em>(names found in the <a href="http://wordpress.org/extend/plugins/" target="_blank">Wordpress Plugin Directory</a>)</em>:<br/>

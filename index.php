@@ -86,7 +86,7 @@ h2 {border-bottom: 2px solid;color: #c2c2c2;margin-bottom: 30px;margin-top: 0;pa
 	
 	<?php if ( $written > 0 ) { ?>
 		<p class="success message">Saved as <?php print $profileName; ?>. 
-		<a href="download.php?file=<?php print $profileName ?>" target="_blank">Download</a>
+		<a href="download.php?file=<?php print $profileName ?>">Download</a>
 		</p>
 	<?php } ?>
 	

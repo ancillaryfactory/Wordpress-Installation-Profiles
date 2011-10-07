@@ -1,4 +1,6 @@
 <?php
+// http://us2.php.net/manual/en/function.readfile.php
+
 $file = 'profiles/' . $_GET['file'];
 
 if (file_exists($file)) {

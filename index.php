@@ -1,6 +1,22 @@
 <?php 
 	require('../wp-blog-header.php');
 	
+//////////////////////////////////////////////////////////////
+	
+	// redirect to login page if not logged in
+	if(!function_exists(is_user_logged_in)){
+  	  die('Sorry, You do not have access to this page.');
+  }
+  if ( !current_user_can('install_plugins') ) {
+	$returnPath = get_settings('siteurl') . '/wp-login.php?redirect_to=' . urlencode($_SERVER['REQUEST_URI']);
+	echo "<script type='text/javascript'>";
+	echo "window.location.href='$returnPath'";
+	echo "</script>";
+	exit();
+  }
+	
+///////////////////////////////////////////////////////////////
+
 	$lines = $_POST['pluginNames'];
 	$linesArray = explode("\n", $lines);
 	
@@ -82,7 +98,7 @@ h2 {border-bottom: 2px solid;color: #c2c2c2;margin-bottom: 30px;margin-top: 0;pa
 <body>
 	<div id="wrapper" style="margin:50px auto;width:600px;padding:40px;border-radius:10px;background:#fff">
 	
-	<h2>WP Installation Profile for <?php echo site_url(); ?></h2>
+	<h2>WP Installation Profile for <br/><span style="color:#777"><?php echo site_url(); ?></span></h2>
 	
 	<?php if ( $written > 0 ) { ?>
 		<p class="success message">Saved as <?php print $profileName; ?>. 

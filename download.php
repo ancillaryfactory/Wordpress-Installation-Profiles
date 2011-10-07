@@ -1,25 +1,19 @@
 <?php
 $file = 'profiles/' . $_GET['file'];
 
-/*
-header('Content-disposition: attachment; filename='.$file);
-header('Content-type: application/octet-stream');
-readfile($file);
-*/
-
-if(!file_exists($file)) {
-    die('Error: File not found.');
-} else {
-     // Set headers
-     header("Cache-Control: public");
-     header("Content-Description: File Transfer");
-     header("Content-Disposition: attachment; filename=$file");
-     header("Content-Type: application/octet-stream");
-     header("Content-Transfer-Encoding: binary");
-    
-     // Read the file from disk
-     readfile($file);
- }
-
+if (file_exists($file)) {
+    header('Content-Description: File Transfer');
+    header('Content-Type: application/octet-stream');
+    header('Content-Disposition: attachment; filename='.basename($file));
+    header('Content-Transfer-Encoding: binary');
+    header('Expires: 0');
+    header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
+    header('Pragma: public');
+    header('Content-Length: ' . filesize($file));
+    ob_clean();
+    flush();
+    readfile($file);
+    exit;
+}
 
 ?> 

@@ -28,7 +28,7 @@
 	
 	
 	
-	if ( isset($_POST['profileName']) && isset($_POST['saveProfile']) ) { 
+	if ( !empty($_POST['profileName']) && isset($_POST['saveProfile'] ) ) { 
 		$profileName = $_POST['profileName'] . '.profile';
 		$profileName = str_replace(' ', '-', $profileName);
 		
@@ -71,12 +71,22 @@ Version 0.3
 				$('#pluginNames').val(text);
 			});
 		$('#profileToDownload').attr('href','download.php?file=' + filename ).attr('title',filename);
-		}); // end .change
+	}); // end .change
 		
-		$('#importFormWrapper').hide();
-		$('#toggleImport').click(function() {
-			$('#importFormWrapper').slideToggle();
-		});
+	$('#importFormWrapper').hide();
+	$('#toggleImport').click(function() {
+		$('#importFormWrapper').slideToggle();
+	});
+	
+	
+	$('#profileForm').submit(function() {
+		pluginNames = $('#pluginNames')
+		if ( pluginNames.val().length == 0 ) {
+			pluginNames.css('border-color','red').focus();
+			return false;
+		}
+	});
+	
 	});
 </script>
 
@@ -107,7 +117,7 @@ h2 {border-bottom: 2px solid;color: #c2c2c2;margin-bottom: 30px;margin-top: 0;pa
 	<h2>WP Installation Profile for <br/><span style="color:#777"><?php echo site_url(); ?></span></h2>
 	
 	<?php if ( $written > 0 ) { ?>
-		<p class="success message">Saved as <?php print $profileName; ?>. 
+		<p class="success message"><strong><?php print $profileName; ?></strong> saved.&nbsp;  
 		<a href="download.php?file=<?php print $profileName ?>">Download</a>
 		</p>
 	<?php } ?>
@@ -121,7 +131,7 @@ h2 {border-bottom: 2px solid;color: #c2c2c2;margin-bottom: 30px;margin-top: 0;pa
 ?></pre>-->
 		
 		<?php 
-		if ( isset($lines) && $_POST['downloadPlugins'] ) { ?>
+		if ( !empty($lines) && $_POST['downloadPlugins'] ) { ?>
 			<div id="downloadSuccessList" class="message">
 			<p><strong>Downloaded plugins:</strong> 
 				<?php print '<a style="float:right" href="' . admin_url('plugins.php') . '">Visit plugins page</a>'; ?>
@@ -195,7 +205,7 @@ h2 {border-bottom: 2px solid;color: #c2c2c2;margin-bottom: 30px;margin-top: 0;pa
 	</div>
 	
 	
-	<form method="post" action="">
+	<form method="post" action="" id="profileForm">
 		<p>
 		
 		<strong>Choose:</strong>

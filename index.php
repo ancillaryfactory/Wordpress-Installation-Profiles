@@ -65,11 +65,13 @@ Version 0.3
 	$('#profileFilename').val('default.profile');
 	
 	$('#profileFilename').change(function() {
-		var filename = 'profiles/' + $(this).val();
-		$.get(filename, function(text) {
+		var filename = $(this).val();
+		var filepath = 'profiles/' + filename;
+		$.get(filepath, function(text) {
 				$('#pluginNames').val(text);
 			});
-		});
+		$('#profileToDownload').attr('href','download.php?file=' + filename ).attr('title',filename);
+		}); // end .change
 		
 		$('#importFormWrapper').hide();
 		$('#toggleImport').click(function() {
@@ -87,16 +89,20 @@ a, a:visited {color:#000}
 #pluginNames, #profileName {border:1px solid #999;padding:5px}
 .success {background:#F7D065;padding:5px}
 h2 {border-bottom: 2px solid;color: #c2c2c2;margin-bottom: 30px;margin-top: 0;padding-bottom: 10px;}
-#importForm {padding: 0 10px 4px;text-align:right;background:#d5d5d5;}
+
+#importForm {padding: 0 10px 4px;text-align:right;background:#d5d5d5;border-radius:10px;width: 412px;}
+#importFormWrapper {margin-bottom:40px;overflow:hidden}
+
 #profileFilename {padding:5px;}
 .message {border-radius: 10px;padding: 10px;}
+#wrapper {margin:50px auto;width:600px;padding:40px;border-radius:10px;background:#fff;}
 
 -->
 </style>
 </head>
 
 <body>
-	<div id="wrapper" style="margin:50px auto;width:600px;padding:40px;border-radius:10px;background:#fff">
+	<div id="wrapper" >
 	
 	<h2>WP Installation Profile for <br/><span style="color:#777"><?php echo site_url(); ?></span></h2>
 	
@@ -174,9 +180,12 @@ h2 {border-bottom: 2px solid;color: #c2c2c2;margin-bottom: 30px;margin-top: 0;pa
 			</div>
 		<?php } // end if isset ?>
 	
-	<p style="margin-top:0px;float:right;text-align: right;width: 90px;"><a href="#" id="toggleImport"><strong>Import profile</strong></a></p>
+	<p style="margin-top:0px;float:right;text-align: right;width: 160px;"><a href="#" id="toggleImport"><strong>Import profile</strong></a><br/><br/>
+	<a id="profileToDownload" title="defautl.profile" href="download.php?file=default.profile"><strong>Download this profile</strong></a>
 	
-	<div id="importFormWrapper" style="margin-bottom:40px;overflow:hidden">
+	</p>
+	
+	<div id="importFormWrapper" >
 		<form method="post" action="" enctype="multipart/form-data" id="importForm">
 			<p style="margin-top:0">
 			<!-- <strong>Import profile:</strong>--><br/>

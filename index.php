@@ -66,6 +66,8 @@ Version 0.3
  
 <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.4/jquery.min.js"></script>
 
+<script type="text/javascript" src="jquery.simplemodal.1.4.1.min.js"></script>
+
 <script type="text/javascript">
   $(document).ready(function() {
 	$('#profileFilename').val('default.profile');
@@ -81,11 +83,7 @@ Version 0.3
 				$('#pluginNames').val(text);
 			}
 		});
-		/*
-		$.get(filepath, function(text) {
-			$('#pluginNames').val(text);
-		});
-		*/
+
 		$('#profileToDownload').attr('href','download.php?file=' + filename ).attr('title',filename);
 	}); // end .change
 		
@@ -96,14 +94,19 @@ Version 0.3
 	
 	
 	$('#profileForm').submit(function() {
-		pluginNames = $('#pluginNames')
+		pluginNames = $('#pluginNames');
 		if ( pluginNames.val().length == 0 ) {
 			pluginNames.css('border-color','red').focus();
 			return false;
-		}
+		} 
 	});
 	
+	$('#downloadPlugins').click(function() {
+		$('#downloadPlugins').val('Downloading...');
+		$.modal('<div><p>Downloading from the Wordpress plugin directory<br/><br/><img src="89.gif" /></p></div>');
 	});
+	
+ });
 </script>
 
 
@@ -122,6 +125,8 @@ h2 {border-bottom: 2px solid;color: #c2c2c2;margin-bottom: 30px;margin-top: 0;pa
 #profileFilename {padding:5px;}
 .message {border-radius: 10px;padding: 10px;}
 #wrapper {margin:50px auto;width:600px;padding:40px;border-radius:10px;background:#fff;position:relative;}
+
+#simplemodal-data {color:#000;padding:40px;background:#d3d3d3;opacity:0.9;font-size:16px;width:500px;font-weight:bold;text-align:center;border-radius:10px}
 
 -->
 </style>
@@ -199,7 +204,7 @@ h2 {border-bottom: 2px solid;color: #c2c2c2;margin-bottom: 30px;margin-top: 0;pa
 						$delete = unlink($filename);
 						print '<li><a href="' . $apiHomepage . '" target="_blank">'. $apiName . '</a> ' . $apiVersion . '</li>';
 					} else {
-						print "<li>Couldn't find " . $line . '</li>';
+						print "<li>Couldn't find <strong>'" . $line . "'</strong></li>";
 					}  
 				
 				
@@ -209,7 +214,7 @@ h2 {border-bottom: 2px solid;color: #c2c2c2;margin-bottom: 30px;margin-top: 0;pa
 		<?php } // end if isset ?>
 	
 	<p style="margin-top:0px;float:right;text-align: right;width: 160px;"><a href="#" id="toggleImport"><strong>Import profile</strong></a><br/><br/>
-	<a id="profileToDownload" title="defautl.profile" href="download.php?file=default.profile"><strong>Download this profile</strong></a>
+	<a id="profileToDownload" title="defautl.profile" href="download.php?file=default.profile"><strong>Download current profile</strong></a>
 	
 	</p>
 	
@@ -249,7 +254,7 @@ h2 {border-bottom: 2px solid;color: #c2c2c2;margin-bottom: 30px;margin-top: 0;pa
 			<textarea name="pluginNames" id="pluginNames" rows="15" cols="46"><?php print $defaultLines; ?></textarea>
 		</p>
 		<input type="submit" name="saveProfile" value="Save profile" style="padding:5px"/>&nbsp;&nbsp;
-		<input type="submit" name="downloadPlugins" value="Download plugins" style="padding:5px"/>
+		<input type="submit" name="downloadPlugins" value="Download plugins" style="padding:5px" id="downloadPlugins"/>
 	</form>
 	
 	</div> <!-- end wrapper -->

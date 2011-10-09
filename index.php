@@ -26,10 +26,16 @@
 		$moved = move_uploaded_file($newFile,$uploadDir);
 	}
 	
-	
-	
-	if ( !empty($_POST['profileName']) && isset($_POST['saveProfile'] ) ) { 
-		$profileName = $_POST['profileName'] . '.profile';
+	// checks for form submission
+	if ( isset($_POST['saveProfile']) || isset($_POST['downloadPlugins']) ) {
+		
+		// checks for new filename or saves over existing file
+		if ( !empty($_POST['profileName']) ) {
+			$profileName = $_POST['profileName'] . '.profile';
+		} else {
+			$profileName = $_POST['profileFilename'];
+		}
+		
 		$profileName = str_replace(' ', '-', $profileName);
 		
 		$newProfile = fopen('profiles/' . $profileName,"w"); 
@@ -67,9 +73,19 @@ Version 0.3
 	$('#profileFilename').change(function() {
 		var filename = $(this).val();
 		var filepath = 'profiles/' + filename;
-		$.get(filepath, function(text) {
+		
+		$.ajax({
+			url: filepath,
+			cache:false,
+			success:function(text) {
 				$('#pluginNames').val(text);
-			});
+			}
+		});
+		/*
+		$.get(filepath, function(text) {
+			$('#pluginNames').val(text);
+		});
+		*/
 		$('#profileToDownload').attr('href','download.php?file=' + filename ).attr('title',filename);
 	}); // end .change
 		
@@ -94,7 +110,7 @@ Version 0.3
 <style type="text/css">
 <!--
 body {font-family: Arial, Helvetica, sans-serif;font-size:12px;background:#999}
-#downloadSuccessList {background:#A6F29F;}
+#downloadSuccessList {background:#A6F29F;margin-bottom: 30px;}
 a, a:visited {color:#000}
 #pluginNames, #profileName {border:1px solid #999;padding:5px}
 .success {background:#F7D065;padding:5px}
@@ -105,7 +121,7 @@ h2 {border-bottom: 2px solid;color: #c2c2c2;margin-bottom: 30px;margin-top: 0;pa
 
 #profileFilename {padding:5px;}
 .message {border-radius: 10px;padding: 10px;}
-#wrapper {margin:50px auto;width:600px;padding:40px;border-radius:10px;background:#fff;}
+#wrapper {margin:50px auto;width:600px;padding:40px;border-radius:10px;background:#fff;position:relative;}
 
 -->
 </style>
@@ -116,7 +132,7 @@ h2 {border-bottom: 2px solid;color: #c2c2c2;margin-bottom: 30px;margin-top: 0;pa
 	
 	<h2>WP Installation Profile for <br/><span style="color:#777"><?php echo site_url(); ?></span></h2>
 	
-	<?php if ( $written > 0 ) { ?>
+	<?php if ( ($written > 0) && !isset($_POST['downloadPlugins']) ) { ?>
 		<p class="success message"><strong><?php print $profileName; ?></strong> saved.&nbsp;  
 		<a href="download.php?file=<?php print $profileName ?>">Download</a>
 		</p>
@@ -126,9 +142,9 @@ h2 {border-bottom: 2px solid;color: #c2c2c2;margin-bottom: 30px;margin-top: 0;pa
 		<p class="success message">Imported <?php print $_FILES['importedFile']['name']; ?>. </p>
 	<?php } ?>
 	
-<!--<pre><?php // print_r($_FILES['importedFile']); 
-// print $uploadDir;
-?></pre>-->
+<!-- <pre><?php //  print_r($_POST); 
+//print $written . ' to profileName: ' . $profileName;
+?></pre> -->
 		
 		<?php 
 		if ( !empty($lines) && $_POST['downloadPlugins'] ) { ?>
@@ -152,36 +168,38 @@ h2 {border-bottom: 2px solid;color: #c2c2c2;margin-bottom: 30px;margin-top: 0;pa
 					$apiVersion = $plugin->version;
 					$apiHomepage = $plugin->homepage;
 					
-					$path_parts = pathinfo($pluginURL);
-					$filename = $path_parts['filename'] . '.' . $path_parts['extension'];
-					$path = $filename;
+					if ( !empty($pluginURL) ) {
+						$path_parts = pathinfo($pluginURL);
+						$filename = $path_parts['filename'] . '.' . $path_parts['extension'];
+						$path = $filename;
 					
-					$ch = curl_init($pluginURL);
-					curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-				 
-					$data = curl_exec($ch);
-				 
-					curl_close($ch);
-				 
-					$downloadTest = file_put_contents($path, $data);
+						$ch = curl_init($pluginURL);
+						curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+					 
+						$data = curl_exec($ch);
+					 
+						curl_close($ch);
+					 
+						$downloadTest = file_put_contents($path, $data);
+					
 
-
-				// extracts and deletes zip file
-					$zip = new ZipArchive;
-						
-					if ($zip->open($filename) === TRUE) {
-						$zip->extractTo(WP_PLUGIN_DIR);
-						$zip->close();
-						//echo 'ok';
-					} else {
-						//echo 'failed';
+						// extracts and deletes zip file
+						$zip = new ZipArchive;
+							
+						if ($zip->open($filename) === TRUE) {
+							$zip->extractTo(WP_PLUGIN_DIR);
+							$zip->close();
+							//echo 'ok';
+						} else {
+							//echo 'failed';
+						}
 					}
 					
 					if ( $downloadTest > 0 ) {
 						$delete = unlink($filename);
 						print '<li><a href="' . $apiHomepage . '" target="_blank">'. $apiName . '</a> ' . $apiVersion . '</li>';
 					} else {
-						print '<li>' . $line . ' not downloaded</li>';
+						print "<li>Couldn't find " . $line . '</li>';
 					}  
 				
 				
@@ -197,8 +215,8 @@ h2 {border-bottom: 2px solid;color: #c2c2c2;margin-bottom: 30px;margin-top: 0;pa
 	
 	<div id="importFormWrapper" >
 		<form method="post" action="" enctype="multipart/form-data" id="importForm">
-			<p style="margin-top:0">
-			<!-- <strong>Import profile:</strong>--><br/>
+			<p style="margin-top:0"><br/>
+			<strong>Upload: </strong>
 			<input type="file" name="importedFile" />
 			<input type="submit" name="importSubmit" value="Upload" /></p>
 		</form>
@@ -208,7 +226,7 @@ h2 {border-bottom: 2px solid;color: #c2c2c2;margin-bottom: 30px;margin-top: 0;pa
 	<form method="post" action="" id="profileForm">
 		<p>
 		
-		<strong>Choose:</strong>
+		<strong>Choose:</strong><br/>
 		<select id="profileFilename" name="profileFilename">
 			<?php 
 			$dir = getcwd() . '/profiles';
@@ -222,16 +240,15 @@ h2 {border-bottom: 2px solid;color: #c2c2c2;margin-bottom: 30px;margin-top: 0;pa
 			}			
 		?>
 		</select>
-		<strong>&nbsp;&nbsp;or 
-		
-		save this profile as:&nbsp;&nbsp;</strong>
-			<input type="text" name="profileName" id="profileName" style="width:150px;" placeholder="Name"/>
+		<br/><br/>
+		<strong>Or save this profile as:</strong><br/>
+			<input type="text" name="profileName" id="profileName" style="width:200px;" placeholder="Name"/>
 		</p><br/>
 		
 		<p><strong>Plugins</strong> <em>(names found in the <a href="http://wordpress.org/extend/plugins/" target="_blank">Wordpress Plugin Directory</a>)</em>:<br/>
 			<textarea name="pluginNames" id="pluginNames" rows="15" cols="46"><?php print $defaultLines; ?></textarea>
 		</p>
-		<input type="submit" name="saveProfile" value="Save this profile" style="padding:5px"/>&nbsp;&nbsp;
+		<input type="submit" name="saveProfile" value="Save profile" style="padding:5px"/>&nbsp;&nbsp;
 		<input type="submit" name="downloadPlugins" value="Download plugins" style="padding:5px"/>
 	</form>
 	
